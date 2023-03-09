@@ -4,6 +4,7 @@ import io
 
 
 #### Declaring variables
+# These variables were created so that it would easier to change in case of updates in the request url
 list_currencies = [
     'AUD', # Australian Dollar
     'BGN', # Bulgarian Lev
@@ -55,6 +56,7 @@ keyEuro_exr = 'EUR'                         # the currency being measured agains
 type_exr = 'SP00'                           # foreign exchange reference rates have code SP00
 seriesVariation_exr = 'A'                   # Average variation for given frequency
 
+# Here the variables are all gathered for the creation of the url
 keys_list = [
     ('freq', keyFreq_exr),
     ('currency_measured', keyCurr_exr),
@@ -74,6 +76,7 @@ url_request = entrypoint_exr + resource_exr + '/' + flowRef_exr + '/' + url_keys
 response = requests.get(url_request, params=parameters, headers={'Accept': 'text/csv'})
 
 #### Putting the data into a dataframe and saving it
+# I selected only a few columns and renamed them to get a better view of the values and their description
 df = pd.read_csv(io.StringIO(response.text))
 df_exr = df[['CURRENCY_DENOM', 'CURRENCY', 'TIME_PERIOD', 'OBS_VALUE', 'TITLE_COMPL']]
 df_exr.columns = ['Currency_base', 'Currency_dest', 'Date', 'Exchange_Rate', 'Description']

@@ -31,11 +31,12 @@ parameters = {
 url_exr = entrypoint_exr + resource_exr + '/' + flowRef_exr + '/' + url_keys
 response_exr = requests.get(url_exr, params=parameters, headers={'Accept': 'text/csv'})
 df = pd.read_csv(io.StringIO(response_exr.text))
-exchange_rate = df.iloc[0].OBS_VALUE
+exchange_rate = df.iloc[0].OBS_VALUE    # This value will be used to make the conversion from USD to EUR
 
 #### Getting all shoe products
 url_categories = 'https://api.escuelajs.co/api/v1/categories?limit=100'
 response_categories = requests.get(url_categories)
+# For getting the id of the category Shoes, this loop was used
 for i in response_categories.json():
     if i['name'] == 'Shoes':
         categoryId = i['id']
@@ -45,7 +46,7 @@ url_shoes = f'https://api.escuelajs.co/api/v1/products/?categoryId={categoryId}'
 response_shoes = requests.get(url_shoes)
 df_response = pd.DataFrame(response_shoes.json())
 df_shoes = df_response[['title', 'description', 'price']]
-df_shoes.columns = ['Title', 'Description', 'Price_USD']
-df_shoes['Price_EUR'] = df_shoes['Price_USD'].apply(lambda x: round(x/exchange_rate, 2))
-df_shoes = df_shoes.assign(Date_ExchangeRate='2023-03-01')
+df_shoes.columns = ['Title', 'Description', 'Price_USD']    # Columns selected and renamed
+df_shoes['Price_EUR'] = df_shoes['Price_USD'].apply(lambda x: round(x/exchange_rate, 2))    # Conversion applied on the value and created a new column for it
+df_shoes = df_shoes.assign(Date_ExchangeRate='2023-03-01')  # Date used for the exchange rate
 df_shoes.to_csv('shoes_prices.csv', index=False)
